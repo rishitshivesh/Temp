@@ -20,6 +20,9 @@ void DisplayAllBook();
 void SearchBook(char*);
 void ModifyBook();
 void DeleteBook();
+void chkadmin();
+void AdminSignUp();
+void AdminLogin();
 //*************************END OF FUNCTION PROTOTYPES******************************
 //**************************CLASS DEFINITIONS**************************************
 class BOOK
@@ -143,7 +146,10 @@ class STUDENT
     {cout<<"\t"<<AdmNo<<setw(20)<<name<<setw(10)<<token<<endl;}
 
 }; 
-
+struct ADMIN
+{
+    char Username[20], Password[20];
+}Admin;
 //*****************************END OF CLASS DEFINITIONS***************************************
 	
     STUDENT Student;
@@ -517,9 +523,83 @@ void outro()
     getch();
 }
 //*******************************END OF FUNCTION DEFINITIONS*********************************
+
+void chkadmin()
+{
+    fstream fil;
+    fil.open("libadmin.dat",ios::binary|ios::in|ios::out);
+    fil.seekg(0,ios::end);
+    if(fil.tellg()==0)
+    {
+       fil.close();
+       AdminSignUp();
+    }
+    else
+    {
+       fil.close();
+       return;
+    }
+    //fil.close();
+}
+
+void AdminSignUp()
+{
+    clrscr();
+    gotoxy(25,1);
+    cout<<"Admin Sign Up\n";
+    cout<<"\n\nEnter Username: ";
+    cin>>Admin.Username;
+    cout<<"\nEnter Password: ";
+    cin>>Admin.Password;
+    fil1.open("libadmin.dat",ios::binary|ios::out);
+    fil1.write((char*)&Admin,sizeof(Admin));
+    fil1.close();
+    return;
+}
+
+void AdminLogin()
+{
+    clrscr();
+    char Username[20],Password[20];
+    gotoxy(25,1);
+    cout<<"Admin Login\n";
+    cout<<"\nEnter Username: ";
+    cin>>Username;
+    cout<<"\nEnter Password: ";
+    char r;
+    int k=0;
+    do
+    {
+	    r=getch();
+    	Password[k]=r;
+	    if(int(r)!=13)
+		printf("*");
+    	k++;
+    }while(int(r)!=13);
+    Password[k-1]='\0';
+    //cin>>Password;
+    fil1.open("libadmin.dat",ios::binary|ios::in);
+    fil1.read((char*)&Admin,sizeof(Admin));
+    if((strcmp(Admin.Username,Username)==0)&&(strcmp(Admin.Password,Password)==0))
+    {
+        clrscr();
+        fil1.close();
+        AdminMenu();
+    }
+    else
+    {
+        fil1.close();
+        cout<<"\nError! Try Again...";
+        getch();
+        return;
+    }
+    
+}
+
 //***********************************MAIN FUNCTION*******************************************
 void main()
 {
+    chkadmin();
     char ch;
     do
     {
@@ -540,7 +620,7 @@ void main()
 			 break;
 	    case '2':BookDeposit();
 			 break;
-	    case '3':AdminMenu();
+	    case '3':AdminLogin();//AdminMenu();
 			break;
 	    case '4':clrscr();
 		     cout<<"Thank You For Using Library Management By Sanket Deb!!";
